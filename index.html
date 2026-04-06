@@ -374,7 +374,7 @@
       <td><span class="tag ${p.archived ? '' : 'active-tag'}">${p.tag}</span></td>
       <td class="note-cell">${p.notes}</td>
       <td class="date-cell">${p.updated}</td>
-      <td class="link-cell"><a href="${base}${p.path}" target="_blank">Open ${arrowSvg}</a></td>`;
+      <td class="link-cell"><a href="${p.path.startsWith('http') ? p.path : base + p.path}" target="_blank">Open ${arrowSvg}</a></td>`;
     return tr;
   }
 
