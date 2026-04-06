@@ -112,8 +112,20 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ── SECTION ── */
-    section { margin-bottom: 52px; }
+    /* ── SUBSECTION (Landing / App) ── */
+    .subsection { margin-bottom: 52px; }
+
+    .subsection-title {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 24px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* ── SECTION (Active / Archived) ── */
+    section { margin-bottom: 36px; }
 
     .section-header {
       display: flex;
@@ -282,12 +294,13 @@
 <script>
   // ═══════════════════════════════════════════════════════
   // YOUR PROTOTYPES
-  // Add client: "TabName" to control which tab it appears in.
-  // Tabs are created automatically from unique client values.
+  // client: "TabName"   → which tab it appears in
+  // section: "App"      → subsection within the tab (optional)
+  //                       omit section to have no subsection grouping
   // ═══════════════════════════════════════════════════════
   const prototypes = [
 
-    // ── SALESFLOW
+    // ── SALESFLOW — App
     {
       name: "Billing Frequency Modal",
       tag: "Billing",
@@ -295,24 +308,17 @@
       updated: "Apr 2026",
       path: "salesflow/billing-modal/",
       client: "Salesflow",
+      section: "App",
       archived: false
     },
     {
-      name: "Compare Plans Table",
-      tag: "Pricing, App",
-      notes: "Modal window with plans",
+      name: "Onboarding v3",
+      tag: "Onboarding",
+      notes: "Revised welcome + setup steps",
       updated: "Mar 2026",
-      path: "https://doki-art.github.io/salesflow/app/plan-comparison-modal.html",
+      path: "salesflow/onboarding-v3/",
       client: "Salesflow",
-      archived: false
-    },
-    {
-      name: "Pricing Landing Page",
-      tag: "Pricing, Landing",
-      notes: "Full Page",
-      updated: "Mar 2026",
-      path: "https://doki-art.github.io/salesflow/landing/pricing.html",
-      client: "Salesflow",
+      section: "App",
       archived: false
     },
     {
@@ -322,7 +328,20 @@
       updated: "Jan 2025",
       path: "salesflow/archived/legacy-nav/",
       client: "Salesflow",
+      section: "App",
       archived: true
+    },
+
+    // ── SALESFLOW — Landing
+    {
+      name: "Pricing Landing Page",
+      tag: "Pricing",
+      notes: "Full Page",
+      updated: "Mar 2026",
+      path: "https://doki-art.github.io/salesflow/landing/pricing.html",
+      client: "Salesflow",
+      section: "Landing",
+      archived: false
     },
 
     // ── DOKIART
@@ -348,7 +367,7 @@
     // ── OTHER
     {
       name: "BFDO landing page",
-      tag: "landing",
+      tag: "Landing",
       notes: "Responsive Landing Page",
       updated: "Apr 2026",
       path: "https://doki-art.github.io/bfdo/index.html",
@@ -378,12 +397,12 @@
     return tr;
   }
 
-  function makeSection(label, items) {
+  function makeSection(label, items, delayOffset = 0) {
     const section = document.createElement('section');
-    const count = document.createElement('div');
-    count.className = 'section-header';
-    count.innerHTML = `<span class="section-label">${label}</span><span class="section-count">${items.length}</span>`;
-    section.appendChild(count);
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.innerHTML = `<span class="section-label">${label}</span><span class="section-count">${items.length}</span>`;
+    section.appendChild(header);
 
     if (!items.length) {
       section.insertAdjacentHTML('beforeend', '<p class="empty">Nothing here yet.</p>');
@@ -391,25 +410,43 @@
       const table = document.createElement('table');
       table.innerHTML = `<thead><tr><th>Project</th><th>Tag</th><th>Notes</th><th>Updated</th><th></th></tr></thead>`;
       const tbody = document.createElement('tbody');
-      items.forEach((p, i) => tbody.appendChild(makeRow(p, i * 50)));
+      items.forEach((p, i) => tbody.appendChild(makeRow(p, (delayOffset + i) * 50)));
       table.appendChild(tbody);
       section.appendChild(table);
     }
     return section;
   }
 
+  function makeSubsection(title, items, delayOffset = 0) {
+    const div = document.createElement('div');
+    div.className = 'subsection';
+
+    const heading = document.createElement('div');
+    heading.className = 'subsection-title';
+    heading.textContent = title;
+    div.appendChild(heading);
+
+    const active   = items.filter(p => !p.archived);
+    const archived = items.filter(p =>  p.archived);
+
+    div.appendChild(makeSection('Active', active, delayOffset));
+    if (archived.length) div.appendChild(makeSection('Archived', archived, delayOffset + active.length));
+
+    return div;
+  }
+
   const tabsBar = document.getElementById('tabs-bar');
   const mainEl  = document.getElementById('main');
 
   clients.forEach((client, i) => {
-    const active   = prototypes.filter(p => p.client === client && !p.archived);
-    const archived = prototypes.filter(p => p.client === client &&  p.archived);
+    const clientItems = prototypes.filter(p => p.client === client);
+    const activeCount = clientItems.filter(p => !p.archived).length;
 
     // tab button
     const tab = document.createElement('button');
     tab.className = 'tab' + (i === 0 ? ' active' : '');
     tab.dataset.client = client;
-    tab.innerHTML = `${client} <span class="tab-count">${active.length}</span>`;
+    tab.innerHTML = `${client} <span class="tab-count">${activeCount}</span>`;
     tab.addEventListener('click', () => switchTab(client));
     tabsBar.appendChild(tab);
 
@@ -417,8 +454,34 @@
     const panel = document.createElement('div');
     panel.className = 'tab-panel' + (i === 0 ? ' active' : '');
     panel.id = 'panel-' + client;
-    panel.appendChild(makeSection('Active', active));
-    if (archived.length) panel.appendChild(makeSection('Archived', archived));
+
+    // check if this client uses sections
+    const sections = [...new Set(clientItems.map(p => p.section).filter(Boolean))];
+
+    if (sections.length > 0) {
+      // render subsections (e.g. App, Landing)
+      let delayOffset = 0;
+      sections.forEach(sec => {
+        const secItems = clientItems.filter(p => p.section === sec);
+        panel.appendChild(makeSubsection(sec, secItems, delayOffset));
+        delayOffset += secItems.length;
+      });
+      // items without a section
+      const unsectioned = clientItems.filter(p => !p.section);
+      if (unsectioned.length) {
+        const active   = unsectioned.filter(p => !p.archived);
+        const archived = unsectioned.filter(p =>  p.archived);
+        panel.appendChild(makeSection('Active', active, delayOffset));
+        if (archived.length) panel.appendChild(makeSection('Archived', archived, delayOffset + active.length));
+      }
+    } else {
+      // no sections — original flat layout
+      const active   = clientItems.filter(p => !p.archived);
+      const archived = clientItems.filter(p =>  p.archived);
+      panel.appendChild(makeSection('Active', active));
+      if (archived.length) panel.appendChild(makeSection('Archived', archived));
+    }
+
     mainEl.appendChild(panel);
   });
 
@@ -427,7 +490,6 @@
       t.classList.toggle('active', t.dataset.client === client));
     document.querySelectorAll('.tab-panel').forEach(p =>
       p.classList.toggle('active', p.id === 'panel-' + client));
-    // re-trigger animations
     document.querySelectorAll('#panel-' + client + ' .fade-row').forEach(r => {
       r.style.animation = 'none';
       void r.offsetHeight;
