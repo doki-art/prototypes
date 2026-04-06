@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prototypes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f2ee;
+      --ink: #1a1714;
+      --muted: #8c877f;
+      --rule: #ddd8d0;
+      --active: #1a1714;
+      --archived: #b0a99f;
+      --tag-bg: #eae6e0;
+      --accent: #c8522a;
+      --card-bg: #faf8f5;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Geist', sans-serif;
+      font-size: 13px;
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 56px 60px 40px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .wordmark {
+      font-family: 'Geist', sans-serif;
+      font-weight: 300;
+      font-size: 36px;
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: -1px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-align: right;
+    }
+
+    .meta strong {
+      color: var(--ink);
+      display: block;
+      font-size: 22px;
+      font-family: 'Geist', sans-serif;
+      font-weight: 300;
+      letter-spacing: -0.5px;
+    }
+
+    /* ── MAIN ── */
+    main {
+      padding: 48px 60px 80px;
+      max-width: 1100px;
+    }
+
+    /* ── SECTION ── */
+    section { margin-bottom: 60px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .section-count {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      background: var(--tag-bg);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ── TABLE ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 0 16px 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    thead th:first-child { padding-left: 0; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--rule);
+      transition: background 0.15s;
+      cursor: default;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody tr:hover { background: var(--card-bg); }
+
+    tbody td {
+      padding: 14px 16px;
+      vertical-align: middle;
+    }
+
+    tbody td:first-child { padding-left: 0; }
+
+    .project-name {
+      font-family: 'Geist', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .archived .project-name { color: var(--archived); }
+
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: var(--tag-bg);
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .tag.active {
+      background: #e8f0e8;
+      color: #3d6b3d;
+    }
+
+    .note-cell { color: var(--muted); }
+
+    .date-cell { color: var(--muted); font-size: 12px; }
+
+    .link-cell a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      transition: opacity 0.15s;
+    }
+
+    .link-cell a:hover { opacity: 0.65; }
+
+    .link-cell a svg {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 24px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6aab6a;
+      margin-right: 6px;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-row {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* stagger each row */
+    tbody tr:nth-child(1) { animation-delay: 0.05s; }
+    tbody tr:nth-child(2) { animation-delay: 0.10s; }
+    tbody tr:nth-child(3) { animation-delay: 0.15s; }
+    tbody tr:nth-child(4) { animation-delay: 0.20s; }
+    tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+    @media (max-width: 680px) {
+      header, main, footer { padding-left: 24px; padding-right: 24px; }
+      header { flex-direction: column; align-items: flex-start; }
+      .meta { text-align: left; }
+      thead { display: none; }
+      tbody td { display: block; padding: 4px 0; }
+      tbody td:first-child { padding-top: 16px; }
+      tbody td:last-child { padding-bottom: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">Prototypes</div>
+  <div class="meta">
+    <strong id="active-count">—</strong>
+    active demos
+  </div>
+</header>
+
+<main>
+
+  <!-- ACTIVE -->
+  <section id="active-section">
+    <div class="section-header">
+      <span class="section-label">Active</span>
+      <span class="section-count" id="active-label">0</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Tag</th>
+          <th>Notes</th>
+          <th>Updated</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="active-body">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ARCHIVED -->
+  <section id="archived-section">
+    <div class="section-header">
+      <span class="section-label">Archived</span>
+      <span class="section-count" id="archived-label">0</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Tag</th>
+          <th>Notes</th>
+          <th>Updated</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="archived-body">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <span><span class="dot"></span>GitHub Pages</span>
+  <span id="footer-date"></span>
+</footer>
+
+<script>
+  // ─────────────────────────────────────────────
+  // EDIT YOUR PROTOTYPES HERE
+  // ─────────────────────────────────────────────
+  const prototypes = [
+    {
+      name: "Billing Frequency Modal",
+      tag: "Salesflow",
+      notes: "Proration logic, plan downgrade flow",
+      updated: "Apr 2026",
+      path: "billing-modal/",
+      archived: false
+    },
+    {
+      name: "Onboarding v3",
+      tag: "Salesflow",
+      notes: "Revised welcome + setup steps",
+      updated: "Mar 2026",
+      path: "onboarding-v3/",
+      archived: false
+    },
+    {
+      name: "Pricing Page Exploration",
+      tag: "Salesflow",
+      notes: "3 layout directions",
+      updated: "Feb 2026",
+      path: "pricing-exploration/",
+      archived: false
+    },
+    {
+      name: "Legacy Nav",
+      tag: "Archive",
+      notes: "Old navigation pattern",
+      updated: "Jan 2025",
+      path: "archived/legacy-nav/",
+      archived: true
+    }
+  ];
+  // ─────────────────────────────────────────────
+
+  const base = window.location.href.replace(/index\.html$/, '');
+
+  function makeRow(p) {
+    const tr = document.createElement('tr');
+    if (p.archived) tr.classList.add('archived');
+    tr.classList.add('fade-row');
+    tr.innerHTML = `
+      <td><span class="project-name">${p.name}</span></td>
+      <td><span class="tag ${p.archived ? '' : 'active'}">${p.tag}</span></td>
+      <td class="note-cell">${p.notes}</td>
+      <td class="date-cell">${p.updated}</td>
+      <td class="link-cell">
+        <a href="${base}${p.path}" target="_blank">
+          Open
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 10L10 2M5 2h5v5"/>
+          </svg>
+        </a>
+      </td>`;
+    return tr;
+  }
+
+  const active   = prototypes.filter(p => !p.archived);
+  const archived = prototypes.filter(p =>  p.archived);
+
+  active.forEach(p   => document.getElementById('active-body').appendChild(makeRow(p)));
+  archived.forEach(p => document.getElementById('archived-body').appendChild(makeRow(p)));
+
+  document.getElementById('active-count').textContent = active.length;
+  document.getElementById('active-label').textContent = active.length;
+  document.getElementById('archived-label').textContent = archived.length;
+
+  const now = new Date();
+  document.getElementById('footer-date').textContent =
+    now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+</script>
+
+</body>
+</html>
