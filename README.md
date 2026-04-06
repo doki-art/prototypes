@@ -1,7 +1,7 @@
 # Prototypes
 
 > Quick access to all live demos  
-> Base URL: `https://yourusername.github.io/prototypes/`
+> Base URL: `https://doki-art.github.io/prototypes/index.html`
 
 ---
 
