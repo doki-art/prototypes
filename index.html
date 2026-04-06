@@ -112,73 +112,73 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ── SUBSECTION (Landing / App) ── */
-    .subsection { margin-bottom: 52px; }
+    /* ── GRID TABLE ── */
+    .section-block { margin-bottom: 48px; }
+    .archived-section-block { margin-top: 8px; }
 
-    .subsection-title {
-      font-size: 13px;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: 24px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--rule);
+    .grid-table {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 130px 1fr 90px 60px;
     }
 
-    /* ── SECTION (Active / Archived) ── */
-    section { margin-bottom: 36px; }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
+    /* Header row */
+    .grid-header {
+      display: contents;
     }
 
-    .section-label {
+    .grid-header > div {
+      padding: 0 16px 10px;
       font-size: 10px;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--muted);
+      font-weight: 400;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
     }
 
-    .section-count {
+    .grid-header > div:first-child { padding-left: 0; }
+    .grid-header > div:last-child  { padding-right: 0; }
+
+    .col-section-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-name-count {
       font-size: 10px;
       color: var(--muted);
       background: var(--tag-bg);
       padding: 2px 8px;
       border-radius: 20px;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
-    /* ── TABLE ── */
-    table { width: 100%; border-collapse: collapse; }
-
-    thead th {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-align: left;
-      padding: 0 16px 10px;
-      border-bottom: 1px solid var(--rule);
-      font-weight: 400;
+    /* Data rows */
+    .grid-row {
+      display: contents;
     }
 
-    thead th:first-child { padding-left: 0; }
-
-    tbody tr {
+    .grid-row > div {
+      padding: 13px 16px;
       border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
       transition: background 0.12s;
     }
 
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--card-bg); }
+    .grid-row > div:first-child { padding-left: 0; }
+    .grid-row > div:last-child  { padding-right: 0; }
 
-    tbody td {
-      padding: 13px 16px;
-      vertical-align: middle;
-    }
+    /* last row — remove border */
+    .grid-row.last-row > div { border-bottom: none; }
 
-    tbody td:first-child { padding-left: 0; }
+    /* hover all cells in row */
+    .grid-row:hover > div { background: var(--card-bg); }
 
     .project-name {
       font-weight: 400;
@@ -186,7 +186,7 @@
       color: var(--ink);
     }
 
-    .archived .project-name { color: var(--archived); }
+    .archived-row .project-name { color: var(--archived); }
 
     .tag {
       display: inline-block;
@@ -215,13 +215,15 @@
       text-decoration: none;
       font-size: 12px;
       transition: opacity 0.15s;
+      white-space: nowrap;
     }
 
     .link-cell a:hover { opacity: 0.6; }
     .link-cell a svg { width: 11px; height: 11px; flex-shrink: 0; }
 
     .empty {
-      padding: 32px 0;
+      grid-column: 1 / -1;
+      padding: 24px 0;
       color: var(--muted);
     }
 
@@ -255,7 +257,7 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .fade-row {
+    .fade-cell {
       opacity: 0;
       animation: fadeUp 0.3s ease forwards;
     }
@@ -265,10 +267,15 @@
       header { flex-direction: column; align-items: flex-start; }
       .meta { text-align: left; }
       .tab { padding: 10px 14px; }
-      thead { display: none; }
-      tbody td { display: block; padding: 3px 0; }
-      tbody td:first-child { padding-top: 14px; }
-      tbody td:last-child { padding-bottom: 14px; }
+      .grid-table { display: block; }
+      .grid-header { display: none; }
+      .grid-row {
+        display: flex;
+        flex-direction: column;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .grid-row > div { border: none; padding: 2px 0; }
     }
   </style>
 </head>
@@ -283,7 +290,6 @@
 </header>
 
 <nav class="tabs-bar" id="tabs-bar"></nav>
-
 <main id="main"></main>
 
 <footer>
@@ -294,9 +300,8 @@
 <script>
   // ═══════════════════════════════════════════════════════
   // YOUR PROTOTYPES
-  // client: "TabName"   → which tab it appears in
+  // client:  "TabName"  → which tab it appears in
   // section: "App"      → subsection within the tab (optional)
-  //                       omit section to have no subsection grouping
   // ═══════════════════════════════════════════════════════
   const prototypes = [
 
@@ -380,59 +385,52 @@
 
   const base = window.location.href.replace(/index\.html$/, '');
   const arrowSvg = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10L10 2M5 2h5v5"/></svg>`;
-
   const clients = [...new Set(prototypes.map(p => p.client))];
+  let delayCounter = 0;
 
-  function makeRow(p, delay) {
-    const tr = document.createElement('tr');
-    if (p.archived) tr.classList.add('archived');
-    tr.classList.add('fade-row');
-    tr.style.animationDelay = delay + 'ms';
-    tr.innerHTML = `
-      <td><span class="project-name">${p.name}</span></td>
-      <td><span class="tag ${p.archived ? '' : 'active-tag'}">${p.tag}</span></td>
-      <td class="note-cell">${p.notes}</td>
-      <td class="date-cell">${p.updated}</td>
-      <td class="link-cell"><a href="${p.path.startsWith('http') ? p.path : base + p.path}" target="_blank">Open ${arrowSvg}</a></td>`;
-    return tr;
+  function makeRow(p, isLast) {
+    const row = document.createElement('div');
+    row.className = 'grid-row' + (p.archived ? ' archived-row' : '') + (isLast ? ' last-row' : '');
+    const d = (delayCounter++) * 50;
+    const href = p.path.startsWith('http') ? p.path : base + p.path;
+    row.innerHTML = `
+      <div class="fade-cell" style="animation-delay:${d}ms"><span class="project-name">${p.name}</span></div>
+      <div class="fade-cell" style="animation-delay:${d}ms"><span class="tag ${p.archived ? '' : 'active-tag'}">${p.tag}</span></div>
+      <div class="note-cell fade-cell" style="animation-delay:${d}ms">${p.notes}</div>
+      <div class="date-cell fade-cell" style="animation-delay:${d}ms">${p.updated}</div>
+      <div class="link-cell fade-cell" style="animation-delay:${d}ms"><a href="${href}" target="_blank">Open ${arrowSvg}</a></div>`;
+    return row;
   }
 
-  function makeSection(label, items, delayOffset = 0) {
-    const section = document.createElement('section');
+  function makeGrid(label, items) {
+    const block = document.createElement('div');
+    block.className = 'section-block';
+
+    const grid = document.createElement('div');
+    grid.className = 'grid-table';
+
+    // header: section label + count in col 1, other col labels
     const header = document.createElement('div');
-    header.className = 'section-header';
-    header.innerHTML = `<span class="section-label">${label}</span><span class="section-count">${items.length}</span>`;
-    section.appendChild(header);
+    header.className = 'grid-header';
+    header.innerHTML = `
+      <div><span class="col-section-name">${label}<span class="section-name-count">${items.length}</span></span></div>
+      <div>Tag</div>
+      <div>Notes</div>
+      <div>Updated</div>
+      <div></div>`;
+    grid.appendChild(header);
 
     if (!items.length) {
-      section.insertAdjacentHTML('beforeend', '<p class="empty">Nothing here yet.</p>');
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Nothing here yet.';
+      grid.appendChild(empty);
     } else {
-      const table = document.createElement('table');
-      table.innerHTML = `<thead><tr><th>Project</th><th>Tag</th><th>Notes</th><th>Updated</th><th></th></tr></thead>`;
-      const tbody = document.createElement('tbody');
-      items.forEach((p, i) => tbody.appendChild(makeRow(p, (delayOffset + i) * 50)));
-      table.appendChild(tbody);
-      section.appendChild(table);
+      items.forEach((p, i) => grid.appendChild(makeRow(p, i === items.length - 1)));
     }
-    return section;
-  }
 
-  function makeSubsection(title, items, delayOffset = 0) {
-    const div = document.createElement('div');
-    div.className = 'subsection';
-
-    const heading = document.createElement('div');
-    heading.className = 'subsection-title';
-    heading.textContent = title;
-    div.appendChild(heading);
-
-    const active   = items.filter(p => !p.archived);
-    const archived = items.filter(p =>  p.archived);
-
-    div.appendChild(makeSection('Active', active, delayOffset));
-    if (archived.length) div.appendChild(makeSection('Archived', archived, delayOffset + active.length));
-
-    return div;
+    block.appendChild(grid);
+    return block;
   }
 
   const tabsBar = document.getElementById('tabs-bar');
@@ -442,7 +440,7 @@
     const clientItems = prototypes.filter(p => p.client === client);
     const activeCount = clientItems.filter(p => !p.archived).length;
 
-    // tab button
+    // tab
     const tab = document.createElement('button');
     tab.className = 'tab' + (i === 0 ? ' active' : '');
     tab.dataset.client = client;
@@ -455,31 +453,24 @@
     panel.className = 'tab-panel' + (i === 0 ? ' active' : '');
     panel.id = 'panel-' + client;
 
-    // check if this client uses sections
     const sections = [...new Set(clientItems.map(p => p.section).filter(Boolean))];
+    const allArchived = clientItems.filter(p => p.archived);
 
     if (sections.length > 0) {
-      // render subsections (e.g. App, Landing)
-      let delayOffset = 0;
       sections.forEach(sec => {
-        const secItems = clientItems.filter(p => p.section === sec);
-        panel.appendChild(makeSubsection(sec, secItems, delayOffset));
-        delayOffset += secItems.length;
+        const secActive = clientItems.filter(p => p.section === sec && !p.archived);
+        panel.appendChild(makeGrid(sec, secActive));
       });
-      // items without a section
-      const unsectioned = clientItems.filter(p => !p.section);
-      if (unsectioned.length) {
-        const active   = unsectioned.filter(p => !p.archived);
-        const archived = unsectioned.filter(p =>  p.archived);
-        panel.appendChild(makeSection('Active', active, delayOffset));
-        if (archived.length) panel.appendChild(makeSection('Archived', archived, delayOffset + active.length));
-      }
     } else {
-      // no sections — original flat layout
-      const active   = clientItems.filter(p => !p.archived);
-      const archived = clientItems.filter(p =>  p.archived);
-      panel.appendChild(makeSection('Active', active));
-      if (archived.length) panel.appendChild(makeSection('Archived', archived));
+      const active = clientItems.filter(p => !p.archived);
+      panel.appendChild(makeGrid('Active', active));
+    }
+
+    // archived always last
+    if (allArchived.length) {
+      const ab = makeGrid('Archived', allArchived);
+      ab.classList.add('archived-section-block');
+      panel.appendChild(ab);
     }
 
     mainEl.appendChild(panel);
@@ -490,10 +481,11 @@
       t.classList.toggle('active', t.dataset.client === client));
     document.querySelectorAll('.tab-panel').forEach(p =>
       p.classList.toggle('active', p.id === 'panel-' + client));
-    document.querySelectorAll('#panel-' + client + ' .fade-row').forEach(r => {
-      r.style.animation = 'none';
-      void r.offsetHeight;
-      r.style.animation = '';
+    delayCounter = 0;
+    document.querySelectorAll('#panel-' + client + ' .fade-cell').forEach(d => {
+      d.style.animation = 'none';
+      void d.offsetHeight;
+      d.style.animation = '';
     });
   }
 
