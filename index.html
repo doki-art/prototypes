@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Prototypes</title>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,7 +13,6 @@
       --ink: #1a1714;
       --muted: #8c877f;
       --rule: #ddd8d0;
-      --active: #1a1714;
       --archived: #b0a99f;
       --tag-bg: #eae6e0;
       --accent: #c8522a;
@@ -26,13 +25,11 @@
       font-family: 'Geist', sans-serif;
       font-size: 13px;
       min-height: 100vh;
-      padding: 0;
     }
 
     /* ── HEADER ── */
     header {
-      padding: 56px 60px 40px;
-      border-bottom: 1px solid var(--rule);
+      padding: 48px 60px 0;
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
@@ -40,44 +37,89 @@
     }
 
     .wordmark {
-      font-family: 'Geist', sans-serif;
       font-weight: 300;
-      font-size: 36px;
-      line-height: 1;
-      color: var(--ink);
+      font-size: 32px;
       letter-spacing: -1px;
+      padding-bottom: 20px;
     }
 
     .meta {
       color: var(--muted);
       font-size: 11px;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       text-align: right;
+      padding-bottom: 22px;
     }
 
     .meta strong {
-      color: var(--ink);
       display: block;
-      font-size: 22px;
-      font-family: 'Geist', sans-serif;
+      font-size: 20px;
       font-weight: 300;
       letter-spacing: -0.5px;
+      color: var(--ink);
+    }
+
+    /* ── TABS ── */
+    .tabs-bar {
+      display: flex;
+      align-items: flex-end;
+      padding: 0 60px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .tab {
+      padding: 12px 20px;
+      font-size: 12px;
+      font-family: 'Geist', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      user-select: none;
+    }
+
+    .tab:hover { color: var(--ink); }
+
+    .tab.active {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+
+    .tab-count {
+      font-size: 10px;
+      background: var(--tag-bg);
+      color: var(--muted);
+      padding: 1px 6px;
+      border-radius: 20px;
+    }
+
+    .tab.active .tab-count {
+      background: var(--ink);
+      color: var(--bg);
     }
 
     /* ── MAIN ── */
-    main {
-      padding: 48px 60px 80px;
-      max-width: 1100px;
-    }
+    main { padding: 40px 60px 80px; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
     /* ── SECTION ── */
-    section { margin-bottom: 60px; }
+    section { margin-bottom: 52px; }
 
     .section-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
     .section-label {
@@ -89,7 +131,6 @@
 
     .section-count {
       font-size: 10px;
-      letter-spacing: 0.1em;
       color: var(--muted);
       background: var(--tag-bg);
       padding: 2px 8px;
@@ -97,10 +138,7 @@
     }
 
     /* ── TABLE ── */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    table { width: 100%; border-collapse: collapse; }
 
     thead th {
       font-size: 10px;
@@ -110,29 +148,27 @@
       text-align: left;
       padding: 0 16px 10px;
       border-bottom: 1px solid var(--rule);
+      font-weight: 400;
     }
 
     thead th:first-child { padding-left: 0; }
 
     tbody tr {
       border-bottom: 1px solid var(--rule);
-      transition: background 0.15s;
-      cursor: default;
+      transition: background 0.12s;
     }
 
     tbody tr:last-child { border-bottom: none; }
-
     tbody tr:hover { background: var(--card-bg); }
 
     tbody td {
-      padding: 14px 16px;
+      padding: 13px 16px;
       vertical-align: middle;
     }
 
     tbody td:first-child { padding-left: 0; }
 
     .project-name {
-      font-family: 'Geist', sans-serif;
       font-weight: 400;
       font-size: 14px;
       color: var(--ink);
@@ -151,50 +187,46 @@
       text-transform: uppercase;
     }
 
-    .tag.active {
+    .tag.active-tag {
       background: #e8f0e8;
       color: #3d6b3d;
     }
 
     .note-cell { color: var(--muted); }
-
     .date-cell { color: var(--muted); font-size: 12px; }
 
     .link-cell a {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       color: var(--accent);
       text-decoration: none;
       font-size: 12px;
-      letter-spacing: 0.04em;
       transition: opacity 0.15s;
     }
 
-    .link-cell a:hover { opacity: 0.65; }
+    .link-cell a:hover { opacity: 0.6; }
+    .link-cell a svg { width: 11px; height: 11px; flex-shrink: 0; }
 
-    .link-cell a svg {
-      width: 12px;
-      height: 12px;
-      flex-shrink: 0;
+    .empty {
+      padding: 32px 0;
+      color: var(--muted);
     }
 
     /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--rule);
-      padding: 24px 60px;
+      padding: 20px 60px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: var(--muted);
       font-size: 11px;
-      letter-spacing: 0.04em;
     }
 
     .dot {
       display: inline-block;
-      width: 6px;
-      height: 6px;
+      width: 6px; height: 6px;
       border-radius: 50%;
       background: #6aab6a;
       margin-right: 6px;
@@ -206,32 +238,25 @@
       50% { opacity: 0.3; }
     }
 
-    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     .fade-row {
       opacity: 0;
-      transform: translateY(8px);
-      animation: fadeUp 0.4s ease forwards;
+      animation: fadeUp 0.3s ease forwards;
     }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* stagger each row */
-    tbody tr:nth-child(1) { animation-delay: 0.05s; }
-    tbody tr:nth-child(2) { animation-delay: 0.10s; }
-    tbody tr:nth-child(3) { animation-delay: 0.15s; }
-    tbody tr:nth-child(4) { animation-delay: 0.20s; }
-    tbody tr:nth-child(5) { animation-delay: 0.25s; }
 
     @media (max-width: 680px) {
-      header, main, footer { padding-left: 24px; padding-right: 24px; }
+      header, .tabs-bar, main, footer { padding-left: 20px; padding-right: 20px; }
       header { flex-direction: column; align-items: flex-start; }
       .meta { text-align: left; }
+      .tab { padding: 10px 14px; }
       thead { display: none; }
-      tbody td { display: block; padding: 4px 0; }
-      tbody td:first-child { padding-top: 16px; }
-      tbody td:last-child { padding-bottom: 16px; }
+      tbody td { display: block; padding: 3px 0; }
+      tbody td:first-child { padding-top: 14px; }
+      tbody td:last-child { padding-bottom: 14px; }
     }
   </style>
 </head>
@@ -240,58 +265,14 @@
 <header>
   <div class="wordmark">Prototypes</div>
   <div class="meta">
-    <strong id="active-count">—</strong>
+    <strong id="total-count">—</strong>
     active demos
   </div>
 </header>
 
-<main>
+<nav class="tabs-bar" id="tabs-bar"></nav>
 
-  <!-- ACTIVE -->
-  <section id="active-section">
-    <div class="section-header">
-      <span class="section-label">Active</span>
-      <span class="section-count" id="active-label">0</span>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Project</th>
-          <th>Tag</th>
-          <th>Notes</th>
-          <th>Updated</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="active-body">
-        <!-- rows injected by JS -->
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ARCHIVED -->
-  <section id="archived-section">
-    <div class="section-header">
-      <span class="section-label">Archived</span>
-      <span class="section-count" id="archived-label">0</span>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Project</th>
-          <th>Tag</th>
-          <th>Notes</th>
-          <th>Updated</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="archived-body">
-        <!-- rows injected by JS -->
-      </tbody>
-    </table>
-  </section>
-
-</main>
+<main id="main"></main>
 
 <footer>
   <span><span class="dot"></span>GitHub Pages</span>
@@ -299,80 +280,166 @@
 </footer>
 
 <script>
-  // ─────────────────────────────────────────────
-  // EDIT YOUR PROTOTYPES HERE
-  // ─────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════
+  // YOUR PROTOTYPES
+  // Add client: "TabName" to control which tab it appears in.
+  // Tabs are created automatically from unique client values.
+  // ═══════════════════════════════════════════════════════
   const prototypes = [
+
+    // ── SALESFLOW
     {
       name: "Billing Frequency Modal",
-      tag: "Salesflow",
+      tag: "Billing",
       notes: "Proration logic, plan downgrade flow",
       updated: "Apr 2026",
-      path: "billing-modal/",
+      path: "salesflow/billing-modal/",
+      client: "Salesflow",
       archived: false
     },
     {
       name: "Onboarding v3",
-      tag: "Salesflow",
+      tag: "Onboarding",
       notes: "Revised welcome + setup steps",
       updated: "Mar 2026",
-      path: "onboarding-v3/",
+      path: "salesflow/onboarding-v3/",
+      client: "Salesflow",
       archived: false
     },
     {
       name: "Pricing Page Exploration",
-      tag: "Salesflow",
+      tag: "Pricing",
       notes: "3 layout directions",
       updated: "Feb 2026",
-      path: "pricing-exploration/",
+      path: "salesflow/pricing-exploration/",
+      client: "Salesflow",
       archived: false
     },
     {
       name: "Legacy Nav",
-      tag: "Archive",
+      tag: "Nav",
       notes: "Old navigation pattern",
       updated: "Jan 2025",
-      path: "archived/legacy-nav/",
+      path: "salesflow/archived/legacy-nav/",
+      client: "Salesflow",
       archived: true
+    },
+
+    // ── DOKIART
+    {
+      name: "Portfolio Landing",
+      tag: "Web",
+      notes: "Hero section explorations",
+      updated: "Mar 2026",
+      path: "dokiart/portfolio-landing/",
+      client: "Dokiart",
+      archived: false
+    },
+    {
+      name: "Gallery View",
+      tag: "UI",
+      notes: "Grid vs masonry layout test",
+      updated: "Feb 2026",
+      path: "dokiart/gallery-view/",
+      client: "Dokiart",
+      archived: false
+    },
+
+    // ── OTHER
+    {
+      name: "BFDO landing page",
+      tag: "landing",
+      notes: "Responcive Landing Page",
+      updated: "Apr 2026",
+      path: "https://doki-art.github.io/bfdo/index.html",
+      client: "Other",
+      archived: false
     }
+
   ];
-  // ─────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════
 
   const base = window.location.href.replace(/index\.html$/, '');
+  const arrowSvg = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10L10 2M5 2h5v5"/></svg>`;
 
-  function makeRow(p) {
+  const clients = [...new Set(prototypes.map(p => p.client))];
+
+  function makeRow(p, delay) {
     const tr = document.createElement('tr');
     if (p.archived) tr.classList.add('archived');
     tr.classList.add('fade-row');
+    tr.style.animationDelay = delay + 'ms';
     tr.innerHTML = `
       <td><span class="project-name">${p.name}</span></td>
-      <td><span class="tag ${p.archived ? '' : 'active'}">${p.tag}</span></td>
+      <td><span class="tag ${p.archived ? '' : 'active-tag'}">${p.tag}</span></td>
       <td class="note-cell">${p.notes}</td>
       <td class="date-cell">${p.updated}</td>
-      <td class="link-cell">
-        <a href="${base}${p.path}" target="_blank">
-          Open
-          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 10L10 2M5 2h5v5"/>
-          </svg>
-        </a>
-      </td>`;
+      <td class="link-cell"><a href="${base}${p.path}" target="_blank">Open ${arrowSvg}</a></td>`;
     return tr;
   }
 
-  const active   = prototypes.filter(p => !p.archived);
-  const archived = prototypes.filter(p =>  p.archived);
+  function makeSection(label, items) {
+    const section = document.createElement('section');
+    const count = document.createElement('div');
+    count.className = 'section-header';
+    count.innerHTML = `<span class="section-label">${label}</span><span class="section-count">${items.length}</span>`;
+    section.appendChild(count);
 
-  active.forEach(p   => document.getElementById('active-body').appendChild(makeRow(p)));
-  archived.forEach(p => document.getElementById('archived-body').appendChild(makeRow(p)));
+    if (!items.length) {
+      section.insertAdjacentHTML('beforeend', '<p class="empty">Nothing here yet.</p>');
+    } else {
+      const table = document.createElement('table');
+      table.innerHTML = `<thead><tr><th>Project</th><th>Tag</th><th>Notes</th><th>Updated</th><th></th></tr></thead>`;
+      const tbody = document.createElement('tbody');
+      items.forEach((p, i) => tbody.appendChild(makeRow(p, i * 50)));
+      table.appendChild(tbody);
+      section.appendChild(table);
+    }
+    return section;
+  }
 
-  document.getElementById('active-count').textContent = active.length;
-  document.getElementById('active-label').textContent = active.length;
-  document.getElementById('archived-label').textContent = archived.length;
+  const tabsBar = document.getElementById('tabs-bar');
+  const mainEl  = document.getElementById('main');
 
-  const now = new Date();
+  clients.forEach((client, i) => {
+    const active   = prototypes.filter(p => p.client === client && !p.archived);
+    const archived = prototypes.filter(p => p.client === client &&  p.archived);
+
+    // tab button
+    const tab = document.createElement('button');
+    tab.className = 'tab' + (i === 0 ? ' active' : '');
+    tab.dataset.client = client;
+    tab.innerHTML = `${client} <span class="tab-count">${active.length}</span>`;
+    tab.addEventListener('click', () => switchTab(client));
+    tabsBar.appendChild(tab);
+
+    // panel
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel' + (i === 0 ? ' active' : '');
+    panel.id = 'panel-' + client;
+    panel.appendChild(makeSection('Active', active));
+    if (archived.length) panel.appendChild(makeSection('Archived', archived));
+    mainEl.appendChild(panel);
+  });
+
+  function switchTab(client) {
+    document.querySelectorAll('.tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.client === client));
+    document.querySelectorAll('.tab-panel').forEach(p =>
+      p.classList.toggle('active', p.id === 'panel-' + client));
+    // re-trigger animations
+    document.querySelectorAll('#panel-' + client + ' .fade-row').forEach(r => {
+      r.style.animation = 'none';
+      void r.offsetHeight;
+      r.style.animation = '';
+    });
+  }
+
+  document.getElementById('total-count').textContent =
+    prototypes.filter(p => !p.archived).length;
+
   document.getElementById('footer-date').textContent =
-    now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 </script>
 
 </body>
